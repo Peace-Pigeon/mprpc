@@ -26,15 +26,27 @@ jobs:
       run: |
         sudo apt-get install libboost-all-dev
         
+    # - name: Install Protobuf
+    #   run: |
+      #   mkdir pb
+      #   cd pb
+      #   pwd
+      #   wget https://github.com/protocolbuffers/protobuf/releases/download/v3.20.3/protoc-3.20.3-linux-x86_64.zip
+      #   unzip ./protoc*
+      #   sudo mv bin/protoc /usr/bin/
+      #   sudo mv ./include/* /usr/include/
+      #   sudo ldconfig
+      #   cd ..
+      #   protoc --version
     - name: Install Protobuf
       run: |
-        mkdir pb
-        cd pb
-        pwd
-        wget https://github.com/protocolbuffers/protobuf/releases/download/v3.20.3/protoc-3.20.3-linux-x86_64.zip
-        unzip ./protoc*
-        sudo mv bin/protoc /usr/bin/
-        sudo mv ./include/* /usr/include/
+        git clone -b v3.20.3 https://github.com/protocolbuffers/protobuf.git
+        cd protobuf
+        git submodule update --init --recursive
+        ./autogen.sh
+        ./configure
+        make
+        sudo make install
         sudo ldconfig
         cd ..
         protoc --version
