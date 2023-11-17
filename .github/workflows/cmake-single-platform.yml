@@ -34,7 +34,7 @@ jobs:
         wget https://github.com/protocolbuffers/protobuf/releases/download/v3.20.3/protoc-3.20.3-linux-x86_64.zip
         unzip ./protoc*
         sudo mv bin/protoc /usr/bin/
-        sudo mv ./include/* /usr/local/lib/
+        sudo mv ./include/* /usr/include/
         sudo ldconfig
         cd ..
         protoc --version
@@ -50,7 +50,7 @@ jobs:
         cd ../build/release*/include
         sudo mv muduo/ /usr/include/
         cd ../lib/
-        sudo mv * /usr/local/lib/
+        sudo mv * /usr/lib/
         sudo ldconfig
         cd ../..
         find /usr/include/muduo
