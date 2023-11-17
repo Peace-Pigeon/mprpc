@@ -22,12 +22,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Create temp dir & env prepare
+    - name: Install libboost
       run: |
         sudo apt-get install libboost-all-dev
-        mkdir temp
-        cd temp
-        pwd
         
     - name: Install Protobuf
       run: |
@@ -44,6 +41,8 @@ jobs:
         
     - name: Install Muduo
       run: |
+        mkdir temp
+        cd temp
         git clone --depth=1 https://github.com/chenshuo/muduo
         cd muduo
         pwd
