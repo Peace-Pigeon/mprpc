@@ -54,8 +54,8 @@ jobs:
     - name: Install Protoc
       uses: arduino/setup-protoc@v2
       with:
-        version: "3.20.3"
-      run: protoc --version
+          version: "3.20.3"
+      #run: protoc --version
 
         
     - name: Install Muduo
@@ -89,7 +89,8 @@ jobs:
       run: ctest -C ${{env.BUILD_TYPE}}
 
     - name: Zip the Build
-      run: zip -r ${{ secrets.ReleaseZipName }} ./*
+      working-directory: ${{github.workspace}}/
+      run: zip -r ${{secrets.ReleaseZipName}} ./*
       
     - uses: "marvinpinto/action-automatic-releases@latest"
       with:
@@ -97,5 +98,5 @@ jobs:
           automatic_release_tag: "latest"
           prerelease: true
           title: "Test Build"
-          files: ${{ secrets.ReleaseZipName }}.zip
+          files: ${{github.workspace}}/${{secrets.ReleaseZipName}}.zip
 
