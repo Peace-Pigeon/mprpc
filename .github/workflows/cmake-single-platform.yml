@@ -41,17 +41,22 @@ jobs:
       #   sudo ldconfig
       #   cd ..
       #   protoc --version
-    - name: Install Protobuf
-      run: |
-        git clone -b v3.20.3 https://github.com/protocolbuffers/protobuf.git
-        cd protobuf
-        git submodule update --init --recursive
-        ./autogen.sh
-        ./configure
-        make -j2
-        sudo make install
-        sudo ldconfig
-        protoc --version
+   # - name: Install Protobuf
+      #run: |
+      #  git clone -b v3.20.3 https://github.com/protocolbuffers/protobuf.git
+      #  cd protobuf
+      #  git submodule update --init --recursive
+      #  ./autogen.sh
+      #  ./configure
+      #  make -j2
+      #  sudo make install
+      #  sudo ldconfig
+    - name: Install Protoc
+      uses: arduino/setup-protoc@v2
+      with:
+        version: "3.20.3"
+      run: protoc --version
+
         
     - name: Install Muduo
       run: |
@@ -84,7 +89,7 @@ jobs:
       run: ctest -C ${{env.BUILD_TYPE}}
 
     - name: Zip the Build
-      run: zip -r ${{ secrets.ReleaseZipName }} ${{github.workspace}} 
+      run: zip -r ${{ secrets.ReleaseZipName }} ./*
       
     - uses: "marvinpinto/action-automatic-releases@latest"
       with:
