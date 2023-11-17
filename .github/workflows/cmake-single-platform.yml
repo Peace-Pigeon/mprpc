@@ -23,6 +23,7 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Create temp dir & env prepare
+      run: |
         sudo apt-get install libboost-all-dev
         mkdir temp
         cd temp
