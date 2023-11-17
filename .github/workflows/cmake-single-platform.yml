@@ -21,15 +21,22 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+
+    - name: Create temp dir & env prepare
+        sudo apt-get install libboost-all-dev
+        mkdir temp
+        cd temp
+        pwd
+        
     - name: Install Protobuf
       run: |
-        git clone -b v3.20.3 https://github.com/protocolbuffers/protobuf.git
-        cd protobuf
-        git submodule update --init --recursive
-        ./autogen.sh
-        ./configure
-        make
-        sudo make install
+        mkdir pb
+        cd pb
+        pwd
+        wget https://github.com/protocolbuffers/protobuf/releases/download/v3.20.3/protoc-3.20.3-linux-x86_64.zip
+        unzip ./protoc*
+        sudo mv bin/protoc /usr/bin/
+        sudo mv ./include/* /usr/local/lib/
         sudo ldconfig
         cd ..
         protoc --version
@@ -38,13 +45,14 @@ jobs:
       run: |
         git clone --depth=1 https://github.com/chenshuo/muduo
         cd muduo
-        sudo apt-get install libboost-all-dev
+        pwd
         sudo ./build.sh install
         cd ../build/release*/include
         sudo mv muduo/ /usr/include/
         cd ../lib/
         sudo mv * /usr/local/lib/
         sudo ldconfig
+        cd ../..
         find /usr/include/muduo
 
     - name: Configure CMake
