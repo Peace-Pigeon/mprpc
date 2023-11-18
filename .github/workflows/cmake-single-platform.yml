@@ -90,7 +90,7 @@ jobs:
 
     - name: Zip the Build
       working-directory: ${{github.workspace}}/
-      run: zip -r ${{secrets.ReleaseZipName}} ./* -x='protobuf/*' -x='muduo/*' -x='build/*'
+      run: zip -r ${{secrets.ReleaseZipName}} ./* -x='protobuf/*' -x='muduo/*' -x='build/*' -x='temp/*'
       
     - uses: "marvinpinto/action-automatic-releases@latest"
       with:
