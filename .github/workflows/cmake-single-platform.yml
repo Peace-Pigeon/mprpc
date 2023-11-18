@@ -5,8 +5,8 @@ name: CMake on a single platform
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  #pull_request:
+    #branches: [ "main" ]
 
 permissions:
   contents: write
@@ -25,7 +25,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with: 
-        ref: 'main'
+        ref: "main"
 
     - name: Install libboost
       run: |
