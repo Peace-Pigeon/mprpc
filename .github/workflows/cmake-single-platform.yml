@@ -48,7 +48,7 @@ jobs:
         git submodule update --init --recursive
         ./autogen.sh
         ./configure
-        make -j2 -Dprotobuf_BUILD_TESTS=OFF
+        make -j2
         sudo make install
         sudo ldconfig
         protoc --version
@@ -90,7 +90,7 @@ jobs:
 
     - name: Zip the Build
       working-directory: ${{github.workspace}}/
-      run: zip -r ${{secrets.ReleaseZipName}} ./* -x='protobuf/*' -x='muduo/*'
+      run: zip -r ${{secrets.ReleaseZipName}} ./* -x='protobuf/*' -x='muduo/*' -x='build/*'
       
     - uses: "marvinpinto/action-automatic-releases@latest"
       with:
