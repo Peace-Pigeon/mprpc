@@ -57,7 +57,6 @@ jobs:
         cd ./example/
         protoc ./user.proto --cpp_out=./
         cd ..
-        sudo mv /usr/lib/libprotobuf* ./lib/
         sudo mv /usr/local/lib/libprotobuf* ./lib/
       working-directory: ${{github.workspace}}
      # git clone -b v3.20.3 https://github.com/protocolbuffers/protobuf.git
