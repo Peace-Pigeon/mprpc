@@ -45,15 +45,25 @@ jobs:
       #   protoc --version
     - name: Install Protobuf
       run: |
-        git clone -b v3.20.3 https://github.com/protocolbuffers/protobuf.git
-        cd protobuf
-        git submodule update --init --recursive
-        ./autogen.sh
-        ./configure
-        make -j2
-        sudo make install
-        sudo ldconfig
+        sudo apt-get install libprotobuf-dev protobuf-compiler
         protoc --version
+        rm ./src/*.pb.cc
+        rm ./src/include/*.pb.h
+        protoc ./src/rpcheader.proto --cpp_out=./
+        mv ./src/*.pb.h ./src/include/
+        rm ./example/*.pb.cc
+        rm ./example/*.pb.h
+        protoc ./example/user.proto --cpp_out=./
+      working-directory: ${{github.workspace}}
+     # git clone -b v3.20.3 https://github.com/protocolbuffers/protobuf.git
+     # cd protobuf
+     # git submodule update --init --recursive
+     # ./autogen.sh
+     # ./configure
+     # make -j2
+     # sudo make install
+     # sudo ldconfig
+        
     #- name: Install Protoc
       #uses: arduino/setup-protoc@v2
       #with:
