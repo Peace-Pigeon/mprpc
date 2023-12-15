@@ -39,6 +39,6 @@ private:
     void OnMessage(const muduo::net::TcpConnectionPtr&,muduo::net::Buffer*,muduo::Timestamp);
 
     // Closure的回调操作，用于序列化rpc的响应和网络发送
-    void SendPrcResponse(const muduo::net::TcpConnectionPtr&,google::protobuf::Message*);
+    void SendRpcResponse(const muduo::net::TcpConnectionPtr&,google::protobuf::Message*);
 };
 
