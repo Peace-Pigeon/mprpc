@@ -26,10 +26,11 @@ void RcpProvider::NotifyService(google::protobuf::Service *service){
         const google::protobuf::MethodDescriptor* pmethodDesc=pserviceDesc->method(i);
         std::string method_name=pmethodDesc->name();                // 假设是UserService
         service_info.m_methodMap.insert({method_name,pmethodDesc}); // pmethodDesc假设是login
+
+        std::cout<<"\tmethod name:"<<method_name<<std::endl;
     }
     service_info.m_service=service;
     m_serviceMap.insert({service_name,service_info});
-    
 }
 
 // 启动rpc服务节点，开始提供rpc远程网络服务
@@ -41,16 +42,17 @@ void RcpProvider::Run(){
 
     // 创建TcpServer对象
     muduo::net::TcpServer server(&m_eventLoop,address,"RpcProvider");
-    // 绑定连接回调和消息方法
+    // 绑定连接回调和消息方法 分离网络代码和业务代码
     server.setConnectionCallback(std::bind(&RcpProvider::OnConnection,this,std::placeholders::_1));
     server.setMessageCallback(std::bind(&RcpProvider::OnMessage,this,std::placeholders::_1,std::placeholders::_2,std::placeholders::_3));
     // 设置muduo库的线程数量
     server.setThreadNum(4);
 
-    std::cout<<"RpcProvider start"<<std::endl;
+    std::cout<<"RpcProvider start"<<ip<<" port:"<<port<<std::endl;
 
     // 启动网络服务
     server.start();
+    // 以阻塞方式等待网络连接的到来
     m_eventLoop.loop();
 }
 
@@ -122,22 +124,27 @@ void RcpProvider::OnMessage(const muduo::net::TcpConnectionPtr& conn,muduo::net:
         return;
     }
     google::protobuf::Message *response=service->GetResponsePrototype(method).New();
+    
     // 给下面的method方法的调用，绑定一个Closeure的回调函数((((((((((((((((((core))))))))))))))))))
-    google::protobuf::Closure* done=google::protobuf::NewCallback<RcpProvider,const muduo::net::TcpConnectionPtr&,google::protobuf::Message*>(this,&RcpProvider::SendPrcResponse,conn,response);
+    google::protobuf::Closure* done=google::protobuf::NewCallback<RcpProvider,const muduo::net::TcpConnectionPtr&,google::protobuf::Message*>(this,&RcpProvider::SendRpcResponse,conn,response);
     // 在框架上根据远端rpc请求，调用当前rpc节点上发布的方法
     service->CallMethod(method,nullptr,request,response,done);
 }
 
 // Closure的回调操作，用于序列化rpc的响应和网络发送
-void RcpProvider::SendPrcResponse(const muduo::net::TcpConnectionPtr& conn,google::protobuf::Message* response){
-    std::string reponse_str;
-    if(response->SerializeToString(&reponse_str)){
+void RcpProvider::SendRpcResponse(const muduo::net::TcpConnectionPtr& conn,google::protobuf::Message* response){
+    std::string response_str;
+    if(response->SerializeToString(&response_str)){
         // response进行序列化
         // 序列化成功后，通过网络把rpc方法执行的结果发送给rpc的调用方
-        conn->send(reponse_str);
+        // std::cout<<"str size: "<<response_str.size()<<std::endl;
+
+        // std::cout<<"response_str-len: "<<response_str.length()<<std::endl;
+        // std::cout<<"response_str: "<<response_str<<std::endl;
+        conn->send(response_str);
     }else{
-        std::cout<<"Serialize reponse_str error!"<<std::endl;
+        std::cout<<"Serialize response_str error!"<<std::endl;
     }
-    std::cout<<"Closure called!!"<<reponse_str<<std::endl;
+    std::cout<<"Closure called!!   response_str:"<<response_str<<std::endl;
     conn->shutdown();       // 模拟http的短链接服务，由rpcProvide主动断开连接
 }

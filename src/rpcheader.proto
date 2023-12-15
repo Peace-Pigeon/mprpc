@@ -7,4 +7,4 @@ message RpcHeader{
     bytes method_name=2;
     uint32 args_size=3;
 }
-// protoc rpcheader.proto --cpp_out=./
+// 生成头文件与源文件命令：protoc rpcheader.proto --cpp_out=./

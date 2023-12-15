@@ -8,6 +8,8 @@
 #include <error.h>
 #include "mprpcapplication.hpp"
 
+// header_size + service_name + method_name + args_size + args
+
 // 所有通过stub代理对象调用的rpc方法，都走到这里，统一做rpc方法调用的数据序列化和网络发送
 void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,google::protobuf::RpcController* controller, const google::protobuf::Message* request,google::protobuf::Message* response, google::protobuf::Closure* done){
     const google::protobuf::ServiceDescriptor* sd=method->service();
@@ -60,6 +62,8 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,g
     std::string ip=MprpcApplication::GetInstance().GetConfig().Load("rpcserverip");
     uint16_t port=atoi(MprpcApplication::GetInstance().GetConfig().Load("rpcserverport").c_str());
 
+    // auto client = new muduo::net::TcpClient(&m_channel_loop, muduo::net::InetAddress(ip, port), "MprpcChannel");
+
     struct sockaddr_in server_addr;
     server_addr.sin_family=AF_INET;
     server_addr.sin_port=htons(port);
@@ -85,13 +89,16 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,g
         close(clientfd);
         return;
     }
+    std::cout<<"recv_size: "<<recv_size<<std::endl;
     // 反序列化rpc调用的响应数据
     // std::string response_str(recv_buf,0,recv_size); // recv_buf中遇到\0之后的数据就保存不下来了导致序列化失败
     // if(!response->ParseFromString(response_str)){
     if(!response->ParseFromArray(recv_buf,recv_size)){
-        std::cout<<"parse error! response_str: "<<recv_buf<<std::endl;
+        std::cout<<"parse error! recv_buf: "<<recv_buf<<std::endl;
         close(clientfd);
         return;
     }
+    std::cout<<"recv_buf: "<<recv_buf<<std::endl;
+    // 关闭socket
     close(clientfd);
 }
