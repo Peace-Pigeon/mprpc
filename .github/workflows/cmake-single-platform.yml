@@ -47,18 +47,19 @@ jobs:
       run: |
         sudo apt-get install libprotobuf-dev protobuf-compiler
         protoc --version
-        rm ./src/*.pb.cc
-        rm ./src/include/*.pb.h
-        cd ./src/
-        protoc ./rpcheader.proto --cpp_out=./
-        cd ..
-        rm ./example/*.pb.cc
-        rm ./example/*.pb.h
-        cd ./example/
-        protoc ./user.proto --cpp_out=./
-        cd ..
-        sudo mv /usr/local/lib/libprotobuf* ./lib/
+
       working-directory: ${{github.workspace}}
+        # rm ./src/*.pb.cc
+        # rm ./src/include/*.pb.h
+        # cd ./src/
+        # protoc ./rpcheader.proto --cpp_out=./
+        # cd ..
+        # rm ./example/*.pb.cc
+        # rm ./example/*.pb.h
+        # cd ./example/
+        # protoc ./user.proto --cpp_out=./
+        # cd ..
+        # sudo mv /usr/local/lib/libprotobuf* ./lib/
      # git clone -b v3.20.3 https://github.com/protocolbuffers/protobuf.git
      # cd protobuf
      # git submodule update --init --recursive
