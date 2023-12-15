@@ -80,7 +80,7 @@ void MprpcChannel::CallMethod(const google::protobuf::MethodDescriptor* method,g
     // 接收rpc请求的响应值
     char recv_buf[1024]={0};
     int recv_size=0;
-    if(recv_size=recv(clientfd,recv_buf,1024,0)==-1){
+    if((recv_size=recv(clientfd,recv_buf,1024,0))==-1){
         std::cout<<"recv error! errno: "<<errno<<std::endl;
         close(clientfd);
         return;
