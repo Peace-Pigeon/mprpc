@@ -15,6 +15,12 @@ public:
         std::cout<<"name: "<<name<<std::endl<<"pwd: "<<pwd<<std::endl;
         return true;
     }
+
+    bool Register(uint32_t id,std::string name,std::string pwd){
+        std::cout<<"doing local service: Register"<<std::endl;
+        std::cout<<"id: "<<id<<"\tname: "<<name<<std::endl<<"\tpwd: "<<pwd<<std::endl;
+        return false;
+    }
     // 重写基类UserServiceRpc的虚函数，下面的方法都是框架直接调用的
     // 1. caller  ==>  Login(LoginRequest) => muduo => callee
     // 2. callee  ==>  Login(LoginResponse) => 交到下面重写的这个Login方法上
@@ -28,22 +34,31 @@ public:
 
         // 做本地业务
         bool login_result = Login(name,pwd);
-        #if defined DEBUG
-        int a;
-        std::cin>>a;
-        login_result = static_cast<bool>(a);
-        #endif
+
         // 把响应写入 包括错误码、错误消息、返回值
         fixbug::ResultCode *code = response->mutable_result();
         code->set_errcode(0);
         code->set_errmsg("");
         response->set_success(login_result);
-        #if defined DEBUG
-        std::cout<<"DEBUG: login_result="<<login_result<<std::endl;
-        std::cout<<"DEBUG: response_success="<<response->success()<<std::endl;
-        #endif
+
         // 执行回调函数 执行响应对象数据的序列化和网络发送（都是由框架来完成的）
         done->Run(); 
+    }
+
+    void Register(::google::protobuf::RpcController* controller,
+                       const ::fixbug::RegisterRequest* request,
+                       ::fixbug::RegisterResponse* response,
+                       ::google::protobuf::Closure* done){
+        uint32_t id=request->id();
+        std::string name=request->name();
+        std::string pwd=request->pwd();
+
+        bool ret=Register(id,name,pwd);
+        response->mutable_result()->set_errcode(0);
+        response->mutable_result()->set_errmsg("");
+        response->set_success(ret);
+
+        done->Run();
     }
 };
 

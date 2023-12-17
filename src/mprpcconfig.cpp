@@ -1,11 +1,13 @@
 #include "mprpcconfig.hpp"
 #include <iostream>
+#include "logger.hpp"
 
 // 负责解析加载配置文件
 void MprpcConfig::LoadConfigFile(const char* config_file){
     FILE *pf=fopen(config_file,"r");
     if(pf==nullptr){
         std::cout<<config_file<<" is note exits!"<<std::endl;
+        LOG_ERROR("%s:%s:%d",__FILE__,__FUNCTION__,__LINE__);
         exit(EXIT_FAILURE);
     }
     // 1.注释  2.正确配置项  3.去掉头部多余的空格

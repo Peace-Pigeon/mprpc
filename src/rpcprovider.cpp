@@ -1,6 +1,7 @@
 #include "rpcprovider.hpp"
 #include "mprpcapplication.hpp"
 #include "rpcheader.pb.h"
+#include "logger.hpp"
 
 /**
  * service_name => service描述
@@ -19,7 +20,8 @@ void RcpProvider::NotifyService(google::protobuf::Service *service){
     // 获取服务对象service的方法数量
     int methodCnt=pserviceDesc->method_count();
 
-    std::cout<<"Service name:"<<service_name<<std::endl;
+    // std::cout<<"Service name:"<<service_name<<std::endl;
+    LOG_INFO("Service name:%s",service_name.c_str());
 
     for (int i = 0; i < methodCnt; i++){
         // 获取了服务对象指定下标的服务方法的描述（抽象描述）
@@ -27,7 +29,8 @@ void RcpProvider::NotifyService(google::protobuf::Service *service){
         std::string method_name=pmethodDesc->name();                // 假设是UserService
         service_info.m_methodMap.insert({method_name,pmethodDesc}); // pmethodDesc假设是login
 
-        std::cout<<"\tmethod name:"<<method_name<<std::endl;
+        // std::cout<<"\tmethod name:"<<method_name<<std::endl;
+        LOG_INFO("\tmethod name: %s",method_name.c_str());
     }
     service_info.m_service=service;
     m_serviceMap.insert({service_name,service_info});
@@ -49,6 +52,7 @@ void RcpProvider::Run(){
     server.setThreadNum(4);
 
     std::cout<<"RpcProvider start"<<ip<<" port:"<<port<<std::endl;
+    LOG_INFO("RpcProvider start");
 
     // 启动网络服务
     server.start();
@@ -90,6 +94,7 @@ void RcpProvider::OnMessage(const muduo::net::TcpConnectionPtr& conn,muduo::net:
     }else{
         // 数据头反序列化失败
         std::cout<<"rpc_header_str: "<<rpc_header_str<<" parse error"<<std::endl;
+        LOG_ERROR("%s:%s:%d",__FILE__,__FUNCTION__,__LINE__);
         return ;
     }
     // 获取rpc方法参数的字符流数据信息
@@ -121,6 +126,7 @@ void RcpProvider::OnMessage(const muduo::net::TcpConnectionPtr& conn,muduo::net:
     google::protobuf::Message *request=service->GetRequestPrototype(method).New();
     if(!request->ParseFromString(args_str)){
         std::cout<<"request parse error! content:"<<args_str<<std::endl;
+        LOG_ERROR("%s:%s:%d",__FILE__,__FUNCTION__,__LINE__);
         return;
     }
     google::protobuf::Message *response=service->GetResponsePrototype(method).New();
@@ -144,6 +150,7 @@ void RcpProvider::SendRpcResponse(const muduo::net::TcpConnectionPtr& conn,googl
         conn->send(response_str);
     }else{
         std::cout<<"Serialize response_str error!"<<std::endl;
+        LOG_ERROR("%s:%s:%d",__FILE__,__FUNCTION__,__LINE__);
     }
     std::cout<<"Closure called!!   response_str:"<<response_str<<std::endl;
     conn->shutdown();       // 模拟http的短链接服务，由rpcProvide主动断开连接
