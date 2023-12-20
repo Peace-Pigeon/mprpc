@@ -20,13 +20,15 @@ void MprpcController::SetFailed(const std::string& reason){
     m_errText = reason;
 }
 
-// 
+// 待开发
 void MprpcController::StartCancel(){
 
 }
 bool MprpcController::IsCanceled() const{
     return false;
 }
+
+// 待开发
 void MprpcController::NotifyOnCancel(google::protobuf::Closure* callback){
 
 }
